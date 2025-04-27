@@ -1,0 +1,31 @@
+country,indicator,obs_value,time_period
+India,DTP3 immunization coverage,82,2018
+India,DTP3 immunization coverage,84,2019
+India,DTP3 immunization coverage,86,2020
+India,DTP3 immunization coverage,88,2021
+India,DTP3 immunization coverage,90,2022
+Brazil,DTP3 immunization coverage,90,2018
+Brazil,DTP3 immunization coverage,91,2019
+Brazil,DTP3 immunization coverage,92,2020
+Brazil,DTP3 immunization coverage,93,2021
+Brazil,DTP3 immunization coverage,94,2022
+Nigeria,DTP3 immunization coverage,55,2018
+Nigeria,DTP3 immunization coverage,57,2019
+Nigeria,DTP3 immunization coverage,59,2020
+Nigeria,DTP3 immunization coverage,60,2021
+Nigeria,DTP3 immunization coverage,62,2022
+South Africa,DTP3 immunization coverage,78,2018
+South Africa,DTP3 immunization coverage,79,2019
+South Africa,DTP3 immunization coverage,80,2020
+South Africa,DTP3 immunization coverage,82,2021
+South Africa,DTP3 immunization coverage,84,2022
+United States of America,DTP3 immunization coverage,94,2018
+United States of America,DTP3 immunization coverage,94,2019
+United States of America,DTP3 immunization coverage,95,2020
+United States of America,DTP3 immunization coverage,96,2021
+United States of America,DTP3 immunization coverage,97,2022
+India,GNI per capita,2000,2022
+Brazil,GNI per capita,9000,2022
+Nigeria,GNI per capita,1500,2022
+South Africa,GNI per capita,6000,2022
+United States of America,GNI per capita,65000,2022

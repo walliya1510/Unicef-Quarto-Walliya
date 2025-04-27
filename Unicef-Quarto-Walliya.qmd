@@ -1,0 +1,132 @@
+---
+title: "UNICEF Data Story: Child Well-being Analysis"
+author: "Walliya Fatima Hassan | Student ID: 110024"
+format:
+  html:
+    embed-resources: true
+    code-fold: true
+    theme: cosmo
+    toc: true
+execute:
+  echo: true
+  eval: true
+  output: true
+---
+
+# Introduction
+
+This report analyzes global DTP vaccination rates using UNICEF data.
+
+_This report is prepared by Walliya Fatima Hassan (Student ID: 110024) for the MSc Management (Strategy) program._
+
+# Setup
+
+```{python}
+import pandas as pd
+import plotly.express as px
+```
+
+# Data Loading
+
+``` {python}
+unicef = pd.read_csv("Unicef.csv")
+```
+
+# Prepare DTP Data
+
+```{python}
+
+dtp_data = unicef[unicef['indicator'].str.contains('DTP', case=False, na=False)]
+dtp_latest = (
+    dtp_data.sort_values('time_period', ascending=False)
+             .drop_duplicates(subset='country')
+)[['country', 'obs_value']].rename(columns={'obs_value': 'DTP_Coverage'})
+```
+
+## 🌍 Global Map of DTP Vaccination Coverage
+
+```{python}
+
+#| fig-cap: "Global DTP Vaccination Coverage Map"
+fig_map = px.choropleth(
+    dtp_latest,
+    locations="country",
+    locationmode="country names",
+    color="DTP_Coverage",
+    color_continuous_scale="Tealgrn",
+    title="DTP Vaccination Coverage (%)"
+)
+fig_map
+```
+
+## 📊 Top 10 Countries by DTP Coverage
+
+```{python}
+
+#| fig-cap: "Top 10 Countries by DTP Coverage"
+top10 = dtp_latest.nlargest(10, 'DTP_Coverage')
+fig_bar = px.bar(
+    top10,
+    x='DTP_Coverage',
+    y='country',
+    orientation='h',
+    color='DTP_Coverage',
+    color_continuous_scale='Blues',
+    title="Top 10 DTP Coverage Countries"
+)
+fig_bar
+```
+
+## 📈 DTP Vaccination Trend Over Years (Sample Countries)
+
+```{python}
+
+#| fig-cap: "DTP Vaccination Trends Over Time"
+sample_countries = ['India', 'Nigeria', 'Brazil', 'United States of America', 'South Africa']
+dtp_sample = dtp_data[dtp_data['country'].isin(sample_countries)]
+
+fig_line = px.line(
+    dtp_sample,
+    x='time_period',
+    y='obs_value',
+    color='country',
+    markers=True,
+    title="DTP Vaccination Trend Over Time"
+)
+fig_line
+```
+
+## 🔵 GNI vs DTP Vaccination Scatter Plot
+
+```{python}
+
+#| fig-cap: "Scatter Plot: GNI vs DTP Coverage"
+gni_data = unicef[unicef['indicator'].str.contains('GNI', case=False, na=False)]
+gni_latest = (
+    gni_data.sort_values('time_period', ascending=False)
+             .drop_duplicates(subset='country')
+)[['country','obs_value']].rename(columns={'obs_value': 'GNI_per_capita'})
+
+merged = pd.merge(dtp_latest, gni_latest, on='country', how='inner')
+
+fig_scatter = px.scatter(
+    merged,
+    x='GNI_per_capita',
+    y='DTP_Coverage',
+    trendline='ols',
+    title="GNI per Capita vs DTP Vaccination Coverage"
+)
+fig_scatter
+```
+
+# Conclusion
+
+- Vaccination coverage rates serve as critical indicators of a nation's healthcare accessibility and efficiency.
+- Higher GNI levels are associated with improved DTP immunization rates.
+- Targeted interventions are required in lower-income countries to enhance healthcare outcomes.
+ 
+# References
+
+- UNICEF Data Sources (2025)
+- World Bank GNI Statistics (2025)
+

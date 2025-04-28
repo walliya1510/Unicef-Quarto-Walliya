@@ -1,0 +1,218 @@
+---
+title: "UNICEF Data Story: Global Child Well-being through DTP Vaccination Analysis"
+author: "Walliya Fatima Hassan | Student ID: 110024"
+format:
+  html:
+    embed-resources: true
+    code-fold: true
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    fig-width: 8
+    fig-height: 5
+    fig-align: center
+    css: styles.css
+execute:
+  echo: false
+  eval: true
+  output: true
+---
+
+# Executive Summary
+
+This report analyzes global disparities in DTP (Diphtheria, Tetanus, and Pertussis) vaccination coverage using UNICEF data. It explores vaccination trends, top-performing countries, and the influence of national income (GNI per capita) on healthcare outcomes.
+
+Key findings reveal:
+
+- Significant regional inequalities in vaccine access.
+- A positive correlation between higher income and better immunization rates.
+- The need for targeted healthcare interventions in low-coverage regions.
+
+The analysis supports strategic actions aligned with SDG 3 (Good Health and Well-Being) to ensure equitable vaccine distribution globally.
+
+---
+
+# Introduction
+
+Vaccination remains one of the most effective public health strategies to safeguard child health. Among vaccines, DTP coverage is widely recognized as a key indicator of healthcare system strength and equity.
+
+This report examines global DTP vaccination rates by analyzing UNICEF's latest child health dataset. It also explores the relationship between economic prosperity and immunization coverage to identify patterns, disparities, and opportunities for improvement.
+
+---
+
+# Data Setup
+
+```{python}
+# Import required libraries
+import pandas as pd
+import plotly.express as px
+import statsmodels.api as sm
+
+# Load the UNICEF dataset
+unicef = pd.read_csv("Unicef.csv")
+```
+
+---
+
+# Methodology
+
+We extracted and analyzed DTP vaccination coverage indicators, complemented by economic metrics (GNI per capita), to uncover patterns and disparities across countries and over time.
+
+---
+
+# DTP Vaccination Data Preparation
+
+```{python}
+# Filter DTP-related indicators
+dtp_data = unicef[unicef['indicator'].str.contains('DTP', case=False, na=False)]
+
+# Select the latest available record per country
+dtp_latest = (
+    dtp_data.sort_values('time_period', ascending=False)
+             .drop_duplicates(subset='country')
+)[['country', 'obs_value']].rename(columns={'obs_value': 'DTP_Coverage'})
+```
+
+---
+
+# Analysis and Visualizations
+
+## Global Distribution of DTP Vaccination Coverage
+
+```{python}
+fig_map = px.choropleth(
+    dtp_latest,
+    locations="country",
+    locationmode="country names",
+    color="DTP_Coverage",
+    color_continuous_scale="Viridis",
+    title="Global DTP Vaccination Coverage (%)",
+    labels={'DTP_Coverage': 'Coverage (%)'},
+    width=750,        # Fixed width for no scroll
+    height=500,       # Good height for clarity
+    projection="natural earth"   # Better global fitting view
+)
+
+# Fine-tune margins
+fig_map.update_layout(
+    margin=dict(l=0, r=0, t=50, b=0),  # remove left/right margins
+    coloraxis_colorbar=dict(
+        title="Coverage (%)",          # Color bar title
+        ticks="outside"                # Ticks outside for neatness
+    )
+)
+
+fig_map.show()
+
+```
+
+**Insight:**  
+Coverage varies greatly, with Sub-Saharan Africa and parts of South Asia showing lower immunization rates.
+
+---
+
+## DTP Vaccination Trends Over Time for Selected Countries
+
+```{python}
+sample_countries = ['India', 'Nigeria', 'Brazil', 'United States of America', 'South Africa']
+dtp_sample = dtp_data[dtp_data['country'].isin(sample_countries)]
+
+fig_line = px.line(
+    dtp_sample,
+    x='time_period',
+    y='obs_value',
+    color='country',
+    markers=True,
+    title="DTP Vaccination Trends Over Time",
+    labels={'obs_value': 'DTP Coverage (%)', 'time_period': 'Year'},
+    width=750,
+    height=500
+)
+fig_line.show()
+```
+
+**Insight:**  
+India and South Africa have shown steady improvement, while Brazil and the USA maintain high stability.
+
+---
+
+## Top 10 Countries with Highest DTP Coverage
+
+```{python}
+top10 = dtp_latest.nlargest(10, 'DTP_Coverage')
+
+fig_bar = px.bar(
+    top10,
+    x='DTP_Coverage',
+    y='country',
+    orientation='h',
+    color='DTP_Coverage',
+    color_continuous_scale='Cividis',
+    title="Top 10 Countries by DTP Coverage",
+    labels={'DTP_Coverage': 'Coverage (%)'},
+    width=800,
+    height=450
+)
+
+fig_bar.update_layout(
+    yaxis=dict(autorange="reversed"),
+    bargap=0.4
+)
+
+fig_bar.show()
+```
+
+**Insight:**  
+Top-performing countries achieve immunization rates near 100%, highlighting effective healthcare programs.
+
+---
+
+## GNI per Capita vs DTP Vaccination Coverage
+
+```{python}
+gni_data = unicef[unicef['indicator'].str.contains('GNI', case=False, na=False)]
+
+gni_latest = (
+    gni_data.sort_values('time_period', ascending=False)
+             .drop_duplicates(subset='country')
+)[['country', 'obs_value']].rename(columns={'obs_value': 'GNI_per_capita'})
+
+merged = pd.merge(dtp_latest, gni_latest, on='country', how='inner')
+
+fig_scatter = px.scatter(
+    merged,
+    x='GNI_per_capita',
+    y='DTP_Coverage',
+    trendline='ols',
+    color='DTP_Coverage',
+    color_continuous_scale='Turbo',
+    title="GNI per Capita vs DTP Vaccination Coverage",
+    labels={
+        'GNI_per_capita': 'GNI per Capita (USD)',
+        'DTP_Coverage': 'DTP Coverage (%)'
+    },
+    width=700,
+    height=500
+)
+fig_scatter.update_traces(marker=dict(size=7, opacity=0.8))
+fig_scatter.show()
+```
+
+**Insight:**  
+Higher income tends to correspond with better vaccination coverage, but governance also plays a key role.
+
+---
+
+# Conclusion
+
+This study highlights global disparities in DTP vaccination coverage, linked closely to national income levels and healthcare system strength. Public health interventions and equitable healthcare investments remain critical to achieving SDG 3 goals globally.
+
+---
+
+# References
+
+- UNICEF (2025). *Immunization and Child Health Data*.
+- World Bank (2025). *Global GNI per Capita Statistics*.
+
+---
